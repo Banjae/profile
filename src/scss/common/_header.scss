@@ -1,6 +1,6 @@
 header {
   width: 100%;
-  background-color: #9DC8C8;
+  background-color: #9dc8c8;
   .inner {
     position: relative;
     width: 1180px;
@@ -29,6 +29,37 @@ header {
           color: #fff;
           font-size: 14px;
         }
+      }
+    }
+    .fa-bars {
+      position: absolute;
+      right: 30px;
+      bottom: 20px;
+      font-size: 24px;
+      color: #fff;
+      display: none;
+    }
+  }
+  &.main {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 9;
+    background: transparent;
+  }
+
+  // pad
+  @media screen and (max-width: $pad) {
+    .inner {
+      width: 100%;
+      h1 {
+        left: 30px;
+      }
+      #gnb {
+        display: none;
+      }
+      .fa-bars {
+        display: block;
       }
     }
   }

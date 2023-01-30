@@ -18,14 +18,11 @@ function App() {
     <>
       <Switch>
         <Route exact path="/">
-          {/* 라우터 값에 따라서 Header props로 type="main" */}
           <Header type={"main"} />
           <Visual />
           <Content />
         </Route>
-        {/* 라우터에 따라 header css 달리하겠다 */}
-        {/* <Header type={"sub"} /> */}
-        <Route path="/" render={() => <header type={"sub"} />} />
+        <Route path="/" render={() => <Header type={"sub"} />} />
       </Switch>
 
       <Route path="/department" component={Department} />
