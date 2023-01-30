@@ -1,9 +1,13 @@
-import React from 'react'
+import React from "react";
 
 const Footer = () => {
   return (
-    <div>Footer</div>
-  )
-}
+    <footer>
+      <div className="inner">
+        <p>Copyright 2023 Portfolio By Banjae._. All Right reserved</p>
+      </div>
+    </footer>
+  );
+};
 
-export default Footer
+export default Footer;

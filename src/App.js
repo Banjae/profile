@@ -1,4 +1,4 @@
-import { Route } from "react-router-dom";
+import { Route, Switch } from "react-router-dom";
 // common
 import Footer from "./components/common/Footer";
 import Header from "./components/common/Header";
@@ -16,12 +16,17 @@ import Gallery from "./components/sub/Gallery";
 function App() {
   return (
     <>
-      <Header />
-
-      <Route exact path="/">
-        <Visual />
-        <Content />
-      </Route>
+      <Switch>
+        <Route exact path="/">
+          {/* 라우터 값에 따라서 Header props로 type="main" */}
+          <Header type={"main"} />
+          <Visual />
+          <Content />
+        </Route>
+        {/* 라우터에 따라 header css 달리하겠다 */}
+        {/* <Header type={"sub"} /> */}
+        <Route path="/" render={() => <header type={"sub"} />} />
+      </Switch>
 
       <Route path="/department" component={Department} />
       <Route path="/community" component={Community} />
@@ -29,6 +34,7 @@ function App() {
       <Route path="/youtube" component={Youtube} />
       <Route path="/location" component={Location} />
       <Route path="/join" component={Join} />
+
       <Footer />
     </>
   );
