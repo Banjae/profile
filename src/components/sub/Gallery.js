@@ -1,9 +1,8 @@
-import React from 'react'
+import React from "react";
+import Layout from "../common/Layout";
 
 const Gallery = () => {
-  return (
-    <div>Gallery</div>
-  )
-}
+  return <Layout title={"Gallery"}>Gallery</Layout>;
+};
 
-export default Gallery
+export default Gallery;
