@@ -9,6 +9,13 @@
     width: 1180px;
     margin: 100px auto;
     min-height: 400px;
+    transition: 2s;
+    transform: translateY(200px);
+  }
+  &.on {
+    > .inner {
+      transform: translateY(0px);
+    }
   }
 }
 // pad
