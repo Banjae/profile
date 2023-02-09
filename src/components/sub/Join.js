@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useDaumPostcodePopup } from "react-daum-postcode";
 import Layout from "../common/Layout";
 
 const Join = () => {
@@ -9,9 +10,15 @@ const Join = () => {
     email: "",
     password: "",
     repassword: "",
+    phone: "",
+    address: "",
+    detailaddress: "",
+    birthday: "",
     gender: "",
     interests: "",
     edu: "",
+    hobby: null,
+    comment: "",
   };
   const [val, setVal] = useState(initVal);
 
@@ -47,6 +54,49 @@ const Join = () => {
     });
   };
 
+  const handlePhone = (e) => {
+    const { name } = e.target;
+    let value = e.target.value;
+    value = value
+      .replace(/[^0-9]/g, "") // 숫자를 제외한 모든 문자 제거
+      .replace(/^(\d{2,3})(\d{3,4})(\d{4})$/, `$1-$2-$3`);
+
+    setVal({ ...val, [name]: value });
+  };
+
+  const handleBirthday = (e) => {
+    const { name } = e.target;
+    let value = e.target.value;
+    value = value.replace(/(\d{4})(\d{2})(\d{2})/, "$1-$2-$3");
+    setVal({ ...val, [name]: value });
+  };
+
+  // Daum Post 연동 이벤트 핸들러
+  // 우편번호 출력
+  const open = useDaumPostcodePopup();
+
+  const handleClick = () => {
+    open({ onComplete: handleComplete });
+  };
+
+  const handleComplete = (data) => {
+    let fullAddress = data.address;
+    let extraAddress = "";
+
+    if (data.addressType === "R") {
+      if (data.bname !== "") {
+        extraAddress += data.bname;
+      }
+      if (data.buildingName !== "") {
+        extraAddress +=
+          extraAddress !== "" ? `, ${data.buildingName}` : data.buildingName;
+      }
+      fullAddress += extraAddress !== "" ? ` (${extraAddress})` : "";
+    }
+
+    setVal({ ...val, address: fullAddress });
+  };
+
   // 에러 정보 관리 객체
   const [err, setErr] = useState({});
 
@@ -77,6 +127,21 @@ const Join = () => {
     if (_val.repassword !== _val.password || !_val.repassword) {
       errs.repassword = "비밀번호가 일치하지 않습니다 ";
     }
+    //  전화번호 체크
+    if (_val.phone === "") {
+      errs.phone = "전화번호를 입력해주세요";
+    }
+    // 주소 체크
+    if (_val.address === "") {
+      errs.address = "주소를 입력해주세요";
+    }
+    if (_val.detailaddress === "") {
+      errs.detailaddress = "상세주소를 입력해주세요";
+    }
+    //  생년월일 체크
+    if (_val.birthday === "") {
+      errs.birthday = "생년월일을 입력해주세요.";
+    }
     // 성별 체크
     if (_val.gender === "") {
       errs.gender = "성별을 선택해주세요";
@@ -89,7 +154,17 @@ const Join = () => {
     if (_val.edu === "") {
       errs.edu = "학력을 선택해주세요.";
     }
+    // 기타 내용 체크
+    if (_val.comment.length < 20) {
+      errs.comment = "남기는 말을 20자 이상 작성해주세요";
+    }
     return errs;
+  };
+
+  // 데이터 reset
+  const handleReset = () => {
+    setVal(initVal);
+    setErr({});
   };
 
   // 전송 실행시 각 항목의 내용 체크
@@ -108,7 +183,7 @@ const Join = () => {
           <table>
             <caption>회원 가입 정보 입력</caption>
             <tbody>
-              {/* 아이디 입력 */}
+              {/* 아이디  */}
               <tr>
                 <th>
                   <label htmlFor="userid">User ID</label>
@@ -172,6 +247,69 @@ const Join = () => {
                   <span className="err">{err.repassword}</span>
                 </td>
               </tr>
+              {/* 휴대폰 */}
+              <tr>
+                <th htmlFor="phone">Phone</th>
+                <td>
+                  <input
+                    type="text"
+                    id="phone"
+                    name="phone"
+                    placeholder="전화번호을 입력해주세요"
+                    maxLength={13}
+                    onChange={handlePhone}
+                    value={val.phone}
+                  />
+                  <span className="err">{err.phone}</span>
+                </td>
+              </tr>
+              {/* 주소 */}
+              <tr>
+                <th>
+                  <label htmlFor="address">Address</label>
+                </th>
+                <td>
+                  <input
+                    type="text"
+                    id="address"
+                    name="address"
+                    placeholder="주소를 입력해주세요."
+                    onChange={handleChange}
+                    readOnly
+                    value={val.address}
+                  ></input>
+                  <button type="button" onClick={handleClick}>
+                    주소 찾기
+                  </button>
+                  <span className="err">{err.address}</span>
+                  <br />
+                  <input
+                    type="text"
+                    id="detailaddress"
+                    name="detailaddress"
+                    placeholder="상세주소를 입력해주세요."
+                    onChange={handleChange}
+                  />
+                  <span className="err">{err.detailaddress}</span>
+                </td>
+              </tr>
+              {/* 생년월일 */}
+              <tr>
+                <th>
+                  <label htmlFor="birthday">Birthday</label>
+                </th>
+                <td>
+                  <input
+                    type="date"
+                    id="birthday"
+                    name="birthday"
+                    onChange={handleBirthday}
+                    maxLength={13}
+                    value={val.birthday}
+                  />
+                  <span className="err">{err.birthday}</span>
+                </td>
+              </tr>
               {/* 성별 체크 */}
               <tr>
                 <th>Gender</th>
@@ -230,7 +368,7 @@ const Join = () => {
               </tr>
               {/* 교육경력 */}
               <tr>
-                <th>EDUCATION</th>
+                <th>Education</th>
                 <td>
                   <select name="edu" id="edu" onChange={handleChange}>
                     <option value="">학력을 선택하세요.</option>
@@ -242,11 +380,27 @@ const Join = () => {
                   <span className="err">{err.edu}</span>
                 </td>
               </tr>
-
+              {/* 기타의견 */}
+              <tr>
+                <th>
+                  <label htmlFor="comment">Comment</label>
+                </th>
+                <td>
+                  <textarea
+                    name="comment"
+                    id="comment"
+                    cols="30"
+                    rows="5"
+                    placeholder="남기는 말을 작성해주세요"
+                    onChange={handleChange}
+                  />
+                  <span className="err">{err.comment}</span>
+                </td>
+              </tr>
               {/* 폼 전송 */}
               <tr>
                 <th colSpan="2">
-                  <input type="reset" value="Reset" />
+                  <input type="reset" value="Reset" onClick={handleReset} />
                   <input type="submit" value="Submit" />
                 </th>
               </tr>
