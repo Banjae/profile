@@ -1,5 +1,6 @@
 import React, { useRef, useState } from "react";
 import Layout from "../common/Layout";
+import CommunityCard from "./CommunityCard";
 
 const Community = () => {
   // 데모용 데이터 생성
@@ -34,7 +35,7 @@ const Community = () => {
       contents.current.value.trim() === ""
     ) {
       resetPost();
-      return alert("제목과 본문을 입력하세요.");
+      return alert("제목과 본문을 입력해주세요");
     }
     // 새로운 포스트 등록
     // state 업데이트라서 화면 갱신
@@ -145,47 +146,17 @@ const Community = () => {
         {/* 목로을 출력할 떈 map, key */}
         {posts.map((item, idx) => {
           return (
-            <article key={idx}>
-              {item.enableUpdate ? (
-                /* 업데이트일때 보여줄 JSX */
-                <>
-                  <div className="txt">
-                    <input
-                      type="txt"
-                      defaultValue={item.title}
-                      placeholder="제목을 입력해주세요"
-                      ref={titleEdit}
-                    />
-                    <br />
-                    <textarea
-                      cols="30"
-                      rows="5"
-                      defaultValue={item.content}
-                      placeholder="내용을 입력해주세요"
-                      ref={contentEdit}
-                    />
-                    <div className="btnSet">
-                      <button onClick={() => savePost(idx)}>Save</button>
-                      <button onClick={() => cancelPost(idx)}>Cancle</button>
-                    </div>
-                  </div>
-                </>
-              ) : (
-                /* 목록일때 보여줄 JSX */
-                <>
-                  <div className="txt">
-                    <h2>{item.title}</h2>
-                    <p>{item.content}</p>
-                  </div>
-                  <div className="btnSet">
-                    {/* 업데이트기능 */}
-                    <button onClick={() => enableUpdate(idx)}>Edit</button>
-                    {/* 삭제기능 */}
-                    <button onClick={() => deletePost(idx)}>Delte</button>
-                  </div>
-                </>
-              )}
-            </article>
+            <CommunityCard
+              key={idx}
+              idx={idx}
+              item={item}
+              titleEdit={titleEdit}
+              contentEdit={contentEdit}
+              savePost={savePost}
+              cancelPost={cancelPost}
+              enableUpdate={enableUpdate}
+              deletePost={deletePost}
+            />
           );
         })}
       </div>
