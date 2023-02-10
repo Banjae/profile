@@ -1,8 +1,32 @@
 import React, { useRef, useState } from "react";
+
+// 01. useform import
+import { useForm } from "react-hook-form";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+
 import Layout from "../common/Layout";
 import CommunityCard from "./CommunityCard";
 
+// 02. form 요소 항목별 에러 체크 정의
+const schema = yup.object({
+  title: yup.string().trim().required("제목을 입력해주세요"),
+  content: yup.string().trim().required("내용을 입력해주세요"),
+});
+
 const Community = () => {
+  // 03. useForm 생성
+  // register : 각 form 의 name 설정
+  // handleSubmit : onSubmit 할때 실행
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({
+    // yup과 연결
+    resolver: yupResolver(schema),
+  });
   // 데모용 데이터 생성
   const initPost = [
     {
@@ -21,30 +45,15 @@ const Community = () => {
 
   const [posts, setPosts] = useState(initPost);
 
-  const input = useRef(null);
-  const contents = useRef(null);
   const titleEdit = useRef(null);
   const contentEdit = useRef(null);
 
   const [allowed, setAllowed] = useState(true);
 
-  const createPost = () => {
-    // 앞자리 및 뒷자리 공백을 제거하기 위해 trim() 사용
-    if (
-      input.current.value.trim() === "" ||
-      contents.current.value.trim() === ""
-    ) {
-      resetPost();
-      return alert("제목과 본문을 입력해주세요");
-    }
-    // 새로운 포스트 등록
-    // state 업데이트라서 화면 갱신
-    setPosts([
-      ...posts,
-      { title: input.current.value, content: contents.current.value },
-    ]);
+  const createPost = (data) => {
+    setPosts([...posts, data]);
     // 입력 저장후 초기화
-    resetPost();
+    reset();
     // 업데이트 가능
     setAllowed((prev) => true);
     // 모든 목록 닫아주기
@@ -56,11 +65,6 @@ const Community = () => {
       });
       return updateArr;
     });
-  };
-
-  const resetPost = () => {
-    input.current.value = "";
-    contents.current.value = "";
   };
 
   // 수정기능
@@ -122,28 +126,29 @@ const Community = () => {
     <Layout title={"Community"}>
       {/* 입력폼 */}
       <div className="inputBox">
-        <form>
-          <input type="text" placeholder="제목을 입력해주세요" ref={input} />
+        <form onSubmit={handleSubmit(createPost)}>
+          <input
+            type="text"
+            placeholder="제목을 입력해주세요"
+            {...register("title")}
+          />
+          <span className="err">{errors.title?.message}</span>
           <br />
           <textarea
             cols="30"
             rows="5"
             placeholder="내용을 입력해주세요"
-            ref={contents}
+            {...register("content")}
           ></textarea>
+          <span className="err">{errors.content?.message}</span>
           <div className="btnSet">
-            <button type="button" onClick={resetPost}>
-              Reset
-            </button>
-            <button type="button" onClick={createPost}>
-              Write
-            </button>
+            <button type="reset">Reset</button>
+            <button type="submit">Write</button>
           </div>
         </form>
       </div>
       {/* 리스트 출력 */}
       <div className="showBox">
-        {/* 목로을 출력할 떈 map, key */}
         {posts.map((item, idx) => {
           return (
             <CommunityCard
