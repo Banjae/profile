@@ -1,17 +1,17 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
+import Layout from "../common/Layout";
+import CommunityCard from "./CommunityCard";
 
 // 01. useform import
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 
-import Layout from "../common/Layout";
-import CommunityCard from "./CommunityCard";
-
 // 02. form 요소 항목별 에러 체크 정의
 const schema = yup.object({
   title: yup.string().trim().required("제목을 입력해주세요"),
   content: yup.string().trim().required("내용을 입력해주세요"),
+  timestamp: yup.string().required("날짜를 선택해 주세요"),
 });
 
 const Community = () => {
@@ -43,10 +43,17 @@ const Community = () => {
     },
   ];
 
-  const [posts, setPosts] = useState(initPost);
+  // 로컬에 저장된 내용을 가지고 온다.
+  const getLocalPost = () => {
+    const data = localStorage.getItem("post");
+    if (data === null) {
+      return [];
+    } else {
+      return JSON.parse(data);
+    }
+  };
 
-  const titleEdit = useRef(null);
-  const contentEdit = useRef(null);
+  const [posts, setPosts] = useState(getLocalPost);
 
   const [allowed, setAllowed] = useState(true);
 
@@ -90,18 +97,14 @@ const Community = () => {
   };
 
   // 수정 저장
-  const savePost = (idx) => {
-    if (!titleEdit.current.value.trim() || !contentEdit.current.value.trim()) {
-      titleEdit.current.value = "";
-      contentEdit.current.value = "";
-      return alert("수정할 제목과 내용을 입력해주세요");
-    }
+  const savePost = (data) => {
     setPosts(
       posts.map((item, index) => {
         setAllowed(true);
-        if (idx === index) {
-          item.title = titleEdit.current.value;
-          item.content = contentEdit.current.value;
+        if (parseInt(data.idx) === index) {
+          item.title = data.title;
+          item.content = data.content;
+          item.timestamp = data.timestamp;
           item.enableUpdate = false;
         }
         return item;
@@ -109,18 +112,23 @@ const Community = () => {
     );
   };
 
-  // 수정 취소
-  const cancelPost = (idx) => {
+  // 업데이트 취소
+  const disableUpdate = (idx) => {
     setAllowed(true);
     setPosts(
       posts.map((item, index) => {
-        if (idx === index) {
+        if (index === idx) {
           item.enableUpdate = false;
         }
         return item;
       })
     );
   };
+
+  // 로컬에 저장
+  useEffect(() => {
+    localStorage.setItem("post", JSON.stringify(posts));
+  }, [posts]);
 
   return (
     <Layout title={"Community"}>
@@ -141,6 +149,10 @@ const Community = () => {
             {...register("content")}
           ></textarea>
           <span className="err">{errors.content?.message}</span>
+          <br />
+          <input type="date" {...register("timestamp")} />
+          <span className="err">{errors.timestamp?.message}</span>
+          <br />
           <div className="btnSet">
             <button type="reset">Reset</button>
             <button type="submit">Write</button>
@@ -155,12 +167,10 @@ const Community = () => {
               key={idx}
               idx={idx}
               item={item}
-              titleEdit={titleEdit}
-              contentEdit={contentEdit}
               savePost={savePost}
-              cancelPost={cancelPost}
               enableUpdate={enableUpdate}
               deletePost={deletePost}
+              disableUpdate={disableUpdate}
             />
           );
         })}
