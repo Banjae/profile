@@ -27,21 +27,6 @@ const Community = () => {
     // yup과 연결
     resolver: yupResolver(schema),
   });
-  // 데모용 데이터 생성
-  const initPost = [
-    {
-      title: "hello",
-      content: "hello world",
-    },
-    {
-      title: "점심",
-      content: "점메추",
-    },
-    {
-      title: "Todo",
-      content: "TypeScript 공부하기",
-    },
-  ];
 
   // 로컬에 저장된 내용을 가지고 온다.
   const getLocalPost = () => {
