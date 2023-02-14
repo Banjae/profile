@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Layout from "../common/Layout";
 import CommunityCard from "./CommunityCard";
 
@@ -57,6 +57,19 @@ const Community = () => {
       });
       return updateArr;
     });
+
+    // 파일 업로드
+
+    // const formData = new FormData();
+    // formData.append("files", uploadFile);
+    // await axios({
+    //   method: "post",
+    //   url: "/api/files/images",
+    //   data: formData,
+    //   headers: {
+    //     "Content-Type": "multipart/form-data",
+    //   },
+    // });
   };
 
   // 수정기능
@@ -115,6 +128,24 @@ const Community = () => {
     localStorage.setItem("post", JSON.stringify(posts));
   }, [posts]);
 
+  // 이미지 업로드
+  const [imgFile, setImgFile] = useState("");
+  const imgRef = useRef(null);
+  const onChangeImg = async (e) => {
+    e.preventDefault();
+    if (e.target.files) {
+      const uploadFile = e.target.files[0];
+      console.log(uploadFile);
+
+      const reader = new FileReader();
+      reader.readAsDataURL(uploadFile);
+      reader.onloadend = () => {
+        // 임시 이미지 주소
+        setImgFile(reader.result);
+      };
+    }
+  };
+
   return (
     <Layout title={"Community"}>
       {/* 입력폼 */}
@@ -138,6 +169,17 @@ const Community = () => {
           <input type="date" {...register("timestamp")} />
           <span className="err">{errors.timestamp?.message}</span>
           <br />
+          {/* 이미지 업로드 하기 : 이미지 미리보기 연동 */}
+          <div>
+            <img src={imgFile} alt="프로필 이미지" />
+            <input
+              type="file"
+              accept="image/*"
+              onInput={onChangeImg}
+              ref={imgRef}
+            />
+          </div>
+
           <div className="btnSet">
             <button type="reset">Reset</button>
             <button type="submit">Write</button>
